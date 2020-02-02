@@ -16,15 +16,27 @@ const GithubStats = dynamic(() => import('../../../components/github-stats'));
 export default function CanaryIndexPage({ page }) {
   return (
     <Fragment>
-      <GithubStats repositoryName="zeit/next.js" />
+      <GithubStats repositoryName="tk-o/wp-next" />
       <FinderPage page={page} />
     </Fragment>
   );
 }
 
-CanaryIndexPage.getInitialProps = async context => {
-  const { country, all } = context.query;
+export async function unstable_getStaticPaths() {
+  return [
+    { params: { country: 'uk', all: ['credit-cards'] } },
+    { params: { country: 'us', all: ['cell-phones'] } },
+    { params: { country: 'au', all: ['ebay-discount-code'] } },
+  ];
+}
 
+export async function unstable_getStaticProps({ params }) {
+  const { country, all } = params;
+
+  return getPageProps({ country, all })
+}
+
+async function getPageProps({ country, all }) {
   const getItemURLFor = taxonomy =>
     getTaxonomyItemURL({
       taxonomy,
@@ -36,7 +48,11 @@ CanaryIndexPage.getInitialProps = async context => {
   let apiResponse;
 
   for (let taxonomy of ['pages', 'posts']) {
-    apiResponse = await fetcher(getItemURLFor(taxonomy));
+    const url = getItemURLFor(taxonomy);
+
+    console.log('calling', url);
+
+    apiResponse = await fetcher(url);
 
     if (hasTaxonomyItem(apiResponse)) {
       break;
@@ -53,10 +69,12 @@ CanaryIndexPage.getInitialProps = async context => {
   const content = page.content.rendered;
 
   return {
-    page: {
-      id,
-      title,
-      content,
+    props: {
+      page: {
+        id,
+        title,
+        content,
+      },
     },
   };
-};
+}
