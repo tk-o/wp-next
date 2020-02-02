@@ -24,9 +24,12 @@ function getApiURLForCountry(country) {
     );
   }
 
-  if (country === 'au') {
-    return 'https://finder.com.au/wp-json/wp/v2';
+  switch (country) {
+    case 'au':
+      return `https://finder.com.au/wp-json/wp/v2`;
+    case 'us':
+      return `https://finder.com/wp-json/wp/v2`;
+    default:
+      return `https://finder.com/${country}/wp-json/wp/v2`;
   }
-
-  return `https://finder.com/${country}/wp-json/wp/v2`;
 }

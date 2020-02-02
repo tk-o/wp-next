@@ -33,10 +33,14 @@ CanaryIndexPage.getInitialProps = async context => {
       fields: ['id', 'title', 'content'],
     });
 
-  let apiResponse = await fetcher(getItemURLFor('page'));
+  let apiResponse;
 
-  if (!hasTaxonomyItem(apiResponse)) {
-    apiResponse = await fetcher(getItemURLFor('posts'));
+  for (let taxonomy of ['pages', 'posts']) {
+    apiResponse = await fetcher(getItemURLFor(taxonomy));
+
+    if (hasTaxonomyItem(apiResponse)) {
+      break;
+    }
   }
 
   if (!hasTaxonomyItem(apiResponse)) {
